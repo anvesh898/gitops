@@ -1,5 +1,4 @@
 name: Merge release branch
-
 on:
   workflow_dispatch:
     inputs:
@@ -14,34 +13,29 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
+        
+      - name: Set up Git config
+        run: |
+          git config --global user.email 'anveshreddythummala@gmail.com'
+          git config --global user.name 'anvesh898'
           
       - name: Merge release branch
         run: |
-          # Set variables
-          GIT_URL="https://github.com/anvesh898" # Replace with your GitHub username
           RELEASE_NAME=${{ github.event.inputs.release_name }}
-          TAG=$(echo "${RELEASE_NAME}" | awk -F"release-" '{print $2}')
-          MASTER_BRANCH="master"
-          
-          # Fetch the latest changes
-          git fetch
           
           # Check out the release branch
+          git fetch
           git checkout "${RELEASE_NAME}"
           git pull origin "${RELEASE_NAME}"
           
-          # Merge the release branch to master
-          git checkout "${MASTER_BRANCH}"
-          git pull origin "${MASTER_BRANCH}"
-          git merge --no-ff "${RELEASE_NAME}"
+          # Check out the master branch
+          git checkout master
+          git pull origin master
           
-          # Push the changes to the master branch
-          git push --set-upstream origin "${MASTER_BRANCH}"
+          # Merge the release branch into master
+          git merge "${RELEASE_NAME}"
+          git push
           
-          # Create a tag and push it
-          git tag "${TAG}" || echo "Tag already exists"
-          git push --tags origin master:master
+          # Delete the release branch
+          git branch -d "${RELEASE_NAME}"
+          git push origin --delete "${RELEASE_NAME}"
