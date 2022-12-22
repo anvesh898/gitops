@@ -7,64 +7,41 @@ on:
         description: 'Name of the release branch to be merged'
         required: true
         default: 'release-2022.01.0'
-      repo_list:
-        description: 'List of repositories to be merged'
-        required: true
 
 jobs:
   merge-release-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out parent repository
+      - name: Check out repository
         uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
           
-      - name: Get repository list
-        id: repo_list
-        run: |
-          REPO_LIST=${{ github.event.inputs.repo_list }}
-          
-          # Set the output variable
-          echo "::set-output name=repo_list::${REPO_LIST}"
-          
       - name: Merge release branch
         run: |
           # Set variables
           GIT_URL="https://github.com/anvesh898" # Replace with your GitHub username
-          ORG_NAME="anvesh898" # Replace with your organization name
           RELEASE_NAME=${{ github.event.inputs.release_name }}
           TAG=$(echo "${RELEASE_NAME}" | awk -F"release-" '{print $2}')
           MASTER_BRANCH="master"
           
-          # Get repository list from output of previous step
-          REPO_LIST=${{ steps.repo_list.outputs.repo_list }}
+          # Fetch the latest changes
+          git fetch
           
-          # Iterate over repositories
-          for repo in ${REPO_LIST}; do
-            # Clone repository if it doesn't already exist
-            if [[ ! -d "$repo" ]]; then
-              git clone "${GIT_URL}"/"${ORG_NAME}"/"${repo}" || exit 1
-            fi
-            cd "${repo}" || { echo "Can not access to ${repo}"; }
-            
-            # Fetch the latest changes
-            git fetch
-            
-            # Check out the release branch
-            git checkout "${RELEASE_NAME}"
-            git pull origin "${RELEASE_NAME}"
-            
-            # Check out the master branch
-            git checkout "${MASTER_BRANCH}"
-            git pull origin "${MASTER_BRANCH}"
-            
-            # Merge the release branch into master
-            git merge --no-ff "${RELEASE_NAME}"
-            
-            # Push the updated master branch to origin
-            git push --set-upstream origin "${MASTER_BRANCH}"
-            
-            #
+          # Check out the release branch
+          git checkout "${RELEASE_NAME}"
+          git pull origin "${RELEASE_NAME}"
+          
+          # Merge the release branch to master
+          git checkout "${MASTER_BRANCH}"
+          git pull origin "${MASTER_BRANCH}"
+          git merge --no-ff "${RELEASE_NAME}"
+          
+          # Push the changes to the master branch
+          git push --set-upstream origin "${MASTER_BRANCH}"
+          
+          # Create a tag and push it
+          git tag "${TAG}" || echo "Tag already exists"
+          git push --tags origin master:master
