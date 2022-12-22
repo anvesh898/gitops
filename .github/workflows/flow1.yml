@@ -21,7 +21,7 @@ jobs:
       - name: Get repository list
         id: repo_list
         run: |
-          REPO_LIST=$(cat config.txt)
+          REPO_LIST=${{ github.event.inputs.repo_list }}
           
           # Set the output variable
           echo "::set-output name=repo_list::${REPO_LIST}"
