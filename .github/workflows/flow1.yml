@@ -18,11 +18,11 @@ jobs:
       - name: Create release branch in each repository
         run: |
           # Check that RELEASE_BRANCH is defined and follows the correct format
-          if [[ -z "${INPUT_RELEASE_BRANCH_NAME}" ]]; then
+          if [[ -z "${release_branch_name}" ]]; then
             echo "RELEASE_BRANCH variable is empty, please use a proper value (release-202x.xx.x) for RELEASE_BRANCH in the workflow configuration"
             exit 1
           fi
-          if [[ ! "${INPUT_RELEASE_BRANCH_NAME}" =~ ^release-[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then 
+          if [[ ! "${release_branch_name}" =~ ^release-[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then 
             echo "RELEASE_BRANCH values does not match release branch name standards, for example: release-2020.10.0"
             exit 1
           fi
@@ -30,6 +30,6 @@ jobs:
           for repo in ${REPO_LIST}; do
             git checkout develop
             git pull origin develop
-            git checkout -b "${INPUT_RELEASE_BRANCH_NAME}"
-            git push --set-upstream origin "${INPUT_RELEASE_BRANCH_NAME}"
+            git checkout -b "${release_branch_name}"
+            git push --set-upstream origin "${release_branch_name}"
           done
