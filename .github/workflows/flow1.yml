@@ -3,33 +3,33 @@ name: Create release branch
 on:
   workflow_dispatch:
     inputs:
-      release_name:
-        description: 'Name of the release branch to be created'
+      release_branch_name:
+        description: Name of the release branch to create (e.g. release-2022.12.1)
         required: true
-        default: 'release-2022.01.0'
 
 jobs:
-  create-release-branch:
+  create_release_branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out current repository
+      - name: Check out repository
         uses: actions/checkout@v2
-          
-      - name: Create release branch
+      - name: Read repository list
         run: |
-          # Set variables
-          GIT_URL="https://github.com/anvesh898" # Replace with your GitHub username
-          ORG_NAME="anvesh898" # Replace with your organization name
-          RELEASE_NAME=${{ github.event.inputs.release_name }}
+          REPO_LIST=$(cat repo_list)
+      - name: Create release branch in each repository
+        run: |
+          # Check that RELEASE_BRANCH is defined and follows the correct format
+          if [[ -z "${INPUT_RELEASE_BRANCH_NAME}" ]]; then
+            echo "RELEASE_BRANCH variable is empty, please use a proper value (release-202x.xx.x) for RELEASE_BRANCH in the workflow configuration"
+            exit 1
+          fi
+          if [[ ! "${INPUT_RELEASE_BRANCH_NAME}" =~ ^release-[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then 
+            echo "RELEASE_BRANCH values does not match release branch name standards, for example: release-2020.10.0"
+            exit 1
+          fi
           
-          # Get current repository name
-          REPO=$(basename "$PWD")
-          
-          # Check out the develop branch
-          git fetch
-          git checkout develop
-          git pull origin develop
-            
-          # Create a new branch from develop
-          git branch "${RELEASE_NAME}"
-          git push --set-upstream origin "${RELEASE_NAME}"
+          for repo in ${REPO_LIST}; do
+            git checkout develop
+            git pull origin develop
+            git checkout -b "${INPUT_RELEASE_BRANCH_NAME}"
+            git push --set-upstream origin "${INPUT_RELEASE_BRANCH_
