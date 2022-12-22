@@ -1,41 +1,57 @@
 name: Merge release branch
+
 on:
   workflow_dispatch:
     inputs:
-      release_name:
-        description: 'Name of the release branch to be merged'
+      release_branch_name:
+        description: Name of the release branch to merge (e.g. release-2022.12.1)
         required: true
-        default: 'release-2022.01.0'
 
 jobs:
-  merge-release-branch:
+  merge_release_branch:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-        
-      - name: Set up Git config
+      - name: Read repository list
         run: |
-          git config --global user.email 'anveshreddythummala@gmail.com'
-          git config --global user.name 'anvesh898'
-          
-      - name: Merge release branch
+          REPO_LIST=$(cat repo_list)
+      - name: Merge release branch in each repository
         run: |
-          RELEASE_NAME=${{ github.event.inputs.release_name }}
+          # Check that RELEASE_BRANCH is defined and follows the correct format
+          if [[ -z "${INPUT_RELEASE_BRANCH_NAME}" ]]; then
+            echo "RELEASE_BRANCH variable is empty, please use a proper value (release-202x.xx.x) for RELEASE_BRANCH in the workflow configuration"
+            exit 1
+          fi
+          if [[ ! "${INPUT_RELEASE_BRANCH_NAME}" =~ ^release-[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then 
+            echo "RELEASE_BRANCH values does not match release branch name standards, for example: release-2020.10.0"
+            exit 1
+          fi
           
-          # Check out the release branch
-          git fetch
-          git checkout "${RELEASE_NAME}"
-          git pull origin "${RELEASE_NAME}"
+          failing_repo_list=()
+          for repo in ${REPO_LIST}; do
+            git checkout "${INPUT_RELEASE_BRANCH_NAME}"
+            git pull origin "${INPUT_RELEASE_BRANCH_NAME}"
+            git checkout master
+            git pull origin master
+            
+            # Attempt to merge the RELEASE_BRANCH into the MASTER_BRANCH
+            if ! git merge --no-ff "${INPUT_RELEASE_BRANCH_NAME}"; then
+              echo "ERROR merging repo: ${repo}. Aborting merge..."
+              git merge --abort
+              failing_repo_list+=(${repo})
+              continue
+            fi
+            git push --set-upstream origin master
+            
+            # Check if there are any differences between the MASTER_BRANCH and RELEASE_BRANCH
+            if [[ $(git diff "${MASTER_BRANCH}" "${INPUT_RELEASE_BRANCH_NAME}" | wc -l) -gt 0 ]]; then
+              echo "There is a difference between master and release branch, please check it, fix it and re-run this workflow"
+              exit 1
+            fi
+          done
           
-          # Check out the master branch
-          git checkout master
-          git pull origin master
-          
-          # Merge the release branch into master
-          git merge "${RELEASE_NAME}"
-          git push
-          
-          # Delete the release branch
-          git branch -d "${RELEASE_NAME}"
-          git push origin --delete "${RELEASE_NAME}"
+          # Print the list of failing repositories, if any
+          if [[ ${#failing_repo_list[@]} -gt 0 ]]; then
+            echo "The following repositories failed to merge the release branch: ${failing_repo_list[*]}"
+          fi
