@@ -1,0 +1,39 @@
+name: Create release branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Name of the release branch to be created'
+        required: true
+        default: 'release-2022.01.0'
+
+jobs:
+  create-release-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out current repository
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+          
+      - name: Create release branch
+        run: |
+          # Set variables
+          GIT_URL="https://github.com/anvesh898" # Replace with your GitHub username
+          ORG_NAME="anvesh898" # Replace with your organization name
+          RELEASE_NAME=${{ github.event.inputs.release_name }}
+          
+          # Get current repository name
+          REPO=$(basename "$PWD")
+          
+          # Check out the develop branch
+          git fetch
+          git checkout develop
+          git pull origin develop
+            
+          # Create a new branch from develop
+          git branch "${RELEASE_NAME}"
+          git push --set-upstream origin "${RELEASE_NAME}"
