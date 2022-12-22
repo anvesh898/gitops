@@ -1,9 +1,11 @@
 name: Create release branch
-
 on:
-  push:
-    branches:
-      - develop
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Name of the release branch to be created'
+        required: true
+        default: 'release-2022.01.0'
 
 jobs:
   create-release-branch:
@@ -19,7 +21,6 @@ jobs:
       - name: Get repository list
         id: repo_list
         run: |
-          # Read repository list from config file (replace with your own method of obtaining the list)
           REPO_LIST=$(cat config.txt)
           
           # Set the output variable
@@ -27,33 +28,22 @@ jobs:
           
       - name: Create release branch
         run: |
-          # Set variables
-          GIT_URL="https://github.com/USERNAME" # Replace with your GitHub username
-          ORG_NAME="ORGANIZATION" # Replace with your organization name
-          RELEASE_NAME="release-2022.01.0" # Replace with desired release name
+          GIT_URL="https://github.com/anvesh898" # Replace with your GitHub username
+          ORG_NAME="gitops" # Replace with your organization name
+          RELEASE_NAME=${{ github.event.inputs.release_name }}
           
-          # Get repository list from output of previous step
           REPO_LIST=${{ steps.repo_list.outputs.repo_list }}
           
-          # Iterate over repositories
           for repo in ${REPO_LIST}; do
-            # Clone repository if it doesn't already exist
             if [[ ! -d "$repo" ]]; then
               git clone "${GIT_URL}"/"${ORG_NAME}"/"${repo}" || exit 1
             fi
             cd "${repo}" || { echo "Can not access to ${repo}"; }
             
-            # Fetch the latest changes
             git fetch
             
-            # Check out the develop branch
             git checkout develop
             git pull origin develop
             
-            # Create a new branch from develop
             git branch "${RELEASE_NAME}"
-            git push --set-upstream origin "${RELEASE_NAME}"
-            
-            # Return to the top level directory
-            cd ..
-          done
+            git push --set-up
