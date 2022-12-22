@@ -32,4 +32,5 @@ jobs:
             git checkout develop
             git pull origin develop
             git checkout -b "${INPUT_RELEASE_BRANCH_NAME}"
-            git push --set-upstream origin "${INPUT_RELEASE_BRANCH_
+            git push --set-upstream origin "${INPUT_RELEASE_BRANCH_NAME}"
+          done
