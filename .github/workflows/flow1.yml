@@ -1,35 +1,39 @@
 name: Create release branch
+
 on:
   workflow_dispatch:
     inputs:
-      release_branch_name:
-        description: Name of the release branch to create (e.g. release-2022.12.1)
+      release_name:
+        description: 'Name of the release branch to be created'
+        required: true
+        default: 'release-2022.01.0'
+      repo_names:
+        description: 'List of repository names to create the release branch in'
         required: true
 
 jobs:
-  create_release_branch:
+  create-release-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out current repository
         uses: actions/checkout@v2
-      - name: Read repository list
-        run: |
-          REPO_LIST=$(cat repo_list)
       - name: Create release branch in each repository
         run: |
-          # Check that RELEASE_BRANCH is defined and follows the correct format
-          if [[ -z "${release_branch_name}" ]]; then
-            echo "RELEASE_BRANCH variable is empty, please use a proper value (release-202x.xx.x) for RELEASE_BRANCH in the workflow configuration"
-            exit 1
-          fi
-          if [[ ! "${release_branch_name}" =~ ^release-[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then 
-            echo "RELEASE_BRANCH values does not match release branch name standards, for example: release-2020.10.0"
-            exit 1
-          fi
+          # Set variables
+          GIT_URL="https://github.com/anvesh898" # Replace with your GitHub username
+          ORG_NAME="anvesh898" # Replace with your organization name
+          RELEASE_NAME=${{ github.event.inputs.release_name }}
+          REPO_NAMES=${{ github.event.inputs.repo_names }}
           
-          for repo in ${REPO_LIST}; do
-            git checkout develop
-            git pull origin develop
-            git checkout -b "${release_branch_name}"
-            git push --set-upstream origin "${release_branch_name}"
+          # Check out the develop branch in each repository
+          for REPO_NAME in ${REPO_NAMES}; do
+            cd "$REPO_NAME"
+            git fetch || { echo "Error fetching updates from remote repository" ; exit 1; }
+            git checkout develop || { echo "Error checking out develop branch" ; exit 1; }
+            git pull origin develop || { echo "Error updating develop branch" ; exit 1; }
+            
+            # Create a new branch from develop
+            git branch "${RELEASE_NAME}" || { echo "Error creating release branch" ; exit 1; }
+            git push --set-upstream origin "${RELEASE_NAME}" || { echo "Error pushing release branch to remote repository" ; exit 1; }
+            cd ..
           done
