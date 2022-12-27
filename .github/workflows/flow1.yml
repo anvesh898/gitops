@@ -14,10 +14,6 @@ jobs:
     steps:
       - name: Check out current repository
         uses: actions/checkout@v2
-      - name: Change to organization directory
-        run: |
-          ORG_NAME="anvesh898" # Replace with your organization name
-          cd "$ORG_NAME" || { echo "Error changing to organization directory" ; exit 1; }
       - name: Create release branch in each repository
         run: |
           # Set variables
