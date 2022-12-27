@@ -15,7 +15,7 @@ jobs:
       - name: Check out repository containing organization directory
         uses: actions/checkout@v2
         with:
-          repository: 'cloud443/organization-repo' # Replace with the name of your repository
+          repository: 'anvesh898/gitops' # Replace with the name of your repository
       - name: Print current working directory
         run: pwd
       - name: Change to organization directory
@@ -35,3 +35,27 @@ jobs:
             # Check if repository directory exists
             if [ ! -d "$REPO_NAME" ]; then
               echo "Repository directory does not exist: $REPO_NAME"
+              exit 1
+            fi
+            
+            # Change to repository directory
+            cd "$REPO_NAME" || { echo "Error changing to repository directory" ; exit 1; }
+            
+            # Fetch updates from remote repository
+            git fetch || { echo "Error fetching updates from remote repository" ; exit 1; }
+            
+            # Check out develop branch
+            git checkout develop || { echo "Error checking out develop branch" ; exit 1; }
+            
+            # Update develop branch
+            git pull origin develop || { echo "Error updating develop branch" ; exit 1; }
+            
+            # Create a new branch from develop
+            git branch "${RELEASE_NAME}" || { echo "Error creating release branch" ; exit 1; }
+            
+            # Push release branch to remote repository
+            git push --set-upstream origin "${RELEASE_NAME}" || { echo "Error pushing release branch to remote repository" ; exit 1; }
+            
+            # Change back to organization directory
+            cd ..
+          done
