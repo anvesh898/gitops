@@ -21,7 +21,7 @@ jobs:
       - name: Create release branch in each repository
         run: |
           # Set variables
-          GIT_URL="https://github.com/anvesh898" # Replace with your GitHub username
+          GIT_URL="https://github.com/" # Replace with your GitHub username
           ORG_NAME="anvesh898" # Replace with your organization name
           RELEASE_NAME=${{ github.event.inputs.release_name }}
           REPO_NAMES=$(cat repo-names.txt)
