@@ -7,9 +7,6 @@ on:
         description: 'Name of the release branch to be created'
         required: true
         default: 'release-2022.01.0'
-      repo_names:
-        description: 'List of repository names to create the release branch in'
-        required: true
 
 jobs:
   create-release-branch:
@@ -20,7 +17,7 @@ jobs:
       - name: Change to organization directory
         run: |
           ORG_NAME="anvesh898" # Replace with your organization name
-          cd "$ORG_NAME" || { echo "Error changing to organization directory" ; exit 1; }
+         # cd "$ORG_NAME" || { echo "Error changing to organization directory" ; exit 1; }
       - name: Create release branch in each repository
         run: |
           # Set variables
