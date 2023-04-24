@@ -12,7 +12,7 @@ jobs:
     steps:
     - name: Download and Extract Code
       run: |
-        curl -L $(curl -s https://webflow.com/your-link-here | grep -oP '(?<=href=")[^"]+(?=")' | grep -i zip) -o code.zip
+        curl -L ${{ github.event.inputs.link }} | grep -oP '(?<=href=")[^"]+(?=")' | grep -i zip -o code.zip
         unzip code.zip -d /tmp/code
     - name: Update Code in Repository
       uses: actions/checkout@v2
