@@ -15,12 +15,15 @@ jobs:
         curl -L ${{ github.event.inputs.link }} -o code.zip
         unzip code.zip -d /tmp/code
     - name: Update Code in Repository
-      uses: jakejarvis/gha-remove-files@master
+      uses: actions/checkout@v2
       with:
-        paths: |
-          /**
-        exclude: |
-          /.git/**
+        ref: main # replace with the name of the branch you want to update
+    - name: Remove Old Code
+      run: |
+        rm -rf ./*
+    - name: Copy New Code
+      run: |
+        cp -r /tmp/code/* .
     - name: Add New Code
       run: |
         git add .
