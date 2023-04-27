@@ -18,12 +18,12 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: main # replace with the name of the branch you want to update
-    - name: Remove Old Code
-      run: |
-        rm -rf ./*
-    - name: Copy New Code
-      run: |
-        cp -r . .
+    #- name: Remove Old Code
+     # run: |
+      #  rm -rf ./*
+   # - name: Copy New Code
+    #  run: |
+      #  cp -r . .
     - name: Add New Code
       run: |
         git add .
