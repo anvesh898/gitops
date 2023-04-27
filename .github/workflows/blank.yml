@@ -12,7 +12,7 @@ jobs:
     steps:
     - name: Download File
       run: |
-        wget -P /tmp --recursive --page-requisites --no-parent ${{ github.event.inputs.link }}
+        wget -P /tmp/code --recursive --page-requisites --no-parent ${{ github.event.inputs.link }}
     - name: Update Code in Repository
       uses: actions/checkout@v2
       with:
@@ -22,13 +22,14 @@ jobs:
       #  rm -rf ./*
     - name: Copy New Code
       run: |
-        cp -r /tmp/ . 
+        cp -r /tmp/code/* . 
     - name: Set Git user name and email
       run: |
         git config --global user.email "mail@cloud443.in"
         git config --global user.name "anvesh"
     - name: Add New Code
       run: |
-        git add /path/to/new/files/*
+        git status
+        git add .
         git commit -m "test1"
         git push origin main 
