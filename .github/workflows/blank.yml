@@ -12,17 +12,17 @@ jobs:
     steps:
     - name: Download and Extract Code
       run: |
-        curl -L ${{ github.event.inputs.link }} 
+        wget --recursive --page-requisites --no-parent ${{ github.event.inputs.link }} 
         #unzip code.zip -d /tmp/code
     - name: Update Code in Repository
       uses: actions/checkout@v2
       with:
         ref: main # replace with the name of the branch you want to update
-    #- name: Remove Old Code
-     # run: |
-      #  rm -rf ./*
-   # - name: Copy New Code
-    #  run: |
+    - name: Remove Old Code
+      run: |
+        rm -rf ./*
+    - name: Copy New Code
+      run: |
       #  cp -r . .
     - name: Set Git user name and email
       run: |
