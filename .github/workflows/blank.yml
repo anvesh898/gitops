@@ -12,8 +12,8 @@ jobs:
     steps:
     - name: Download and Extract Code
       run: |
-        curl -L ${{ github.event.inputs.link }}  -o code.zip
-        unzip code.zip -d /tmp/code
+        curl -L ${{ github.event.inputs.link }} 
+        #unzip code.zip -d /tmp/code
     - name: Update Code in Repository
       uses: actions/checkout@v2
       with:
@@ -23,7 +23,7 @@ jobs:
         rm -rf ./*
     - name: Copy New Code
       run: |
-        cp -r /tmp/code/* .
+        cp -r . .
     - name: Add New Code
       run: |
         git add .
