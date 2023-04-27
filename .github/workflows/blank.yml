@@ -3,33 +3,32 @@ on:
   workflow_dispatch:
     inputs:
       link:
-        description: 'Link to Zip File'
+        description: 'Link to File'
         required: true
 
 jobs:
   update_code:
     runs-on: ubuntu-latest
     steps:
-    - name: Download and Extract Code
+    - name: Download File
       run: |
-        wget --recursive --page-requisites --no-parent ${{ github.event.inputs.link }} 
-        #unzip code.zip -d /tmp/code
+        wget -P /tmp --recursive --page-requisites --no-parent ${{ github.event.inputs.link }}
     - name: Update Code in Repository
       uses: actions/checkout@v2
       with:
         ref: main # replace with the name of the branch you want to update
-    - name: Remove Old Code
-      run: |
-        rm -rf ./*
+    #- name: Remove Old Code
+     # run: |
+      #  rm -rf ./*
     - name: Copy New Code
       run: |
-      #  cp -r . .
+        cp -r /tmp/ . 
     - name: Set Git user name and email
       run: |
         git config --global user.email "mail@cloud443.in"
         git config --global user.name "anvesh"
     - name: Add New Code
       run: |
-        git add .
-        git commit -m "Update code from ${{ github.event.inputs.link }}"
-        git push
+        git add /path/to/new/files/*
+        git commit -m "test1"
+        git push origin main 
