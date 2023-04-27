@@ -22,7 +22,7 @@ jobs:
       #  rm -rf ./*
     - name: Copy New Code
       run: |
-        cp -r /tmp/code/* . 
+        cp -r /tmp/code/gabriels-fantabulous-site-23ac8b.webflow.io/* . 
     - name: Set Git user name and email
       run: |
         git config --global user.email "mail@cloud443.in"
@@ -31,5 +31,5 @@ jobs:
       run: |
         git status
         git add .
-        git commit -m "test1"
+        git commit -m "test2"
         git push origin main 
