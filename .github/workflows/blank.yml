@@ -24,6 +24,10 @@ jobs:
    # - name: Copy New Code
     #  run: |
       #  cp -r . .
+    - name: Set Git user name and email
+      run: |
+        git config --global user.email "mail@cloud443.in"
+        git config --global user.name "anvesh"
     - name: Add New Code
       run: |
         git add .
