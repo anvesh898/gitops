@@ -1,36 +1,29 @@
-name: Update Code1
+name: Download website images
 
 on:
   workflow_dispatch:
     inputs:
-      url:
-        description: 'URL of the zip file'
+      website-url:
+        description: 'Website URL to download images from'
         required: true
 
 jobs:
-  update-code:
+  download-images:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Download code.zip
-        run: curl -L ${{ github.event.inputs.url }} -o code.zip
-
-      - name: Extract HTML source code
-        run: unzip -p code.zip | grep -oP '(?<=href=")[^"]+(?=")' | grep -i zip | xargs curl -LO
-
-      - name: Remove existing files
-        uses: jakejarvis/gha-remove-files@master
-        with:
-          files: |
-            **/*
-
-      - name: Unzip new code
-        run: unzip -q '*.zip'
-
+      - name: Create images folder
+        run: mkdir images
+      - name: Download images
+        run: |
+          cd images
+          wget -nd -r -l 1 -A jpg,jpeg,png,gif ${{ github.event.inputs.website-url }}
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'Update code'
-          commit_options: '--no-verify'
+        if: always()
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add images/*
+          git commit -m "Add downloaded images"
+          git push
