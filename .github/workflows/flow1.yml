@@ -20,7 +20,7 @@ jobs:
       - name: Download images
         run: |
           cd images
-          wget -nd -r -l 1 -A jpg,jpeg,png,gif ${{ github.event.inputs.website-url }}
+          wget -nd -r -l 1 -A jpg,jpeg,png,gif,svg ${{ github.event.inputs.website-url }}
       - name: Commit changes
         if: always()
         run: |
