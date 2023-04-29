@@ -17,15 +17,10 @@ jobs:
         run: |
            mkdir images
            chmod -R 777 images
-      - name: Install pup
-        run: |
-          curl -L -o pup https://github.com/ericchiang/pup/releases/latest/download/pup_linux_amd64.zip
-          unzip pup_linux_amd64.zip
-          chmod +x pup
       - name: Download images
         run: |
           cd images
-          wget $(curl -s ${{ github.event.inputs.website-url }} | pup 'img[src] attr{src}')
+          wget -r -A=.jpg,.png,.svg ${{ github.event.inputs.website-url }} 
       - name: Commit changes
         if: always()
         run: |
