@@ -1,31 +1,22 @@
-name: Download website images
-
-on:
-  workflow_dispatch:
-    inputs:
-      website-url:
-        description: 'Website URL to download images from'
-        required: true
+name: Download Images
+on: [push]
 
 jobs:
-  download-images:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Create images folder
-        run: |
-           mkdir images
-           chmod -R 777 images
-      - name: Download images
-        run: |
-          cd images
-          wget -r -A=.jpg,.png,.svg ${{ github.event.inputs.website-url }} 
-      - name: Commit changes
-        if: always()
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add .
-          git commit -m "Add downloaded images"
-          git push
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4 lxml Pillow
+      
+    - name: Run script
+      run: python images.py
