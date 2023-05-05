@@ -5,8 +5,8 @@ on:
 
 jobs:
   my-job:
-    needs: [Update Code]
-    if: github.event.workflow_run.conclusion == 'success' && needs.Update Code.outputs.workflow_1_output == 'Workflow 1 completed'
+    needs: [Update-Code]
+    if: github.event.workflow_run.conclusion == 'success' && needs.Update-Code.outputs.workflow_1_output == 'Workflow 1 completed'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
