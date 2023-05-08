@@ -13,7 +13,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Edit image URL
       run: |
-        sed -i 's|https://uploads-ssl.webflow.com/63ff41bea75a049e418bbd55|/images' index.html
+        sed -i 's|https://uploads-ssl.webflow.com/63ff41bea75a049e418bbd55|/images|g' index.html
     - name: Set Git user name and email
       run: |
           git config --global user.email "mail@cloud443.in"
