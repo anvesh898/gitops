@@ -15,12 +15,12 @@ jobs:
       run: |
         sed -i 's|https://uploads-ssl.webflow.com/63ff41bea75a049e418bbd55|/images' index.html
     - name: Set Git user name and email
-        run: |
+      run: |
           git config --global user.email "mail@cloud443.in"
           git config --global user.name "anvesh"
 
-      - name: Add New Code
-        run: |
+    - name: Add New Code
+      run: |
           git status
           git add .
           git commit -m "Update link"
