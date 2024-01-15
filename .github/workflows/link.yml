@@ -1,29 +1,47 @@
-name: Edit Image URL
+name: Auto Tag on Merge Approval
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+   types: [closed]
 
 jobs:
-  edit-image:
+  tag_on_merge_approval:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Edit image URL
-      run: |
-        sed -i 's|https://uploads-ssl.webflow.com/63ff41bea75a049e418bbd55|/images|g' index.html
-    - name: Set Git user name and email
-      run: |
-          git config --global user.email "mail@cloud443.in"
-          git config --global user.name "anvesh"
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Add New Code
-      run: |
-          git status
-          git add .
-          git commit -m "Update link"
-          git push origin main
+      - name: Set up Git
+        run: git config --global user.email "you@example.com" && git config --global user.name "Your Name"
 
- 
+      name: Auto Tag on Merge Approval
+
+on:
+  workflow_dispatch: # Manually trigger the workflow
+
+jobs:
+  tag_on_merge_approval:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: git config --global user.email "you@example.com" && git config --global user.name "Your Name"
+
+      - name: Get the latest tag (if available)
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+          echo "Latest tag: $latest_tag"
+
+          # Check if the base branch is main
+          if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+            # Increment the tag
+            new_tag=$(python -c "version = list(map(int, '$latest_tag'.split('.'))); version[-1] += 1; print('.'.join(map(str, version)))")
+
+            # Create and push the new tag
+            git tag $new_tag
+            git push origin $new_tag
+          fi
