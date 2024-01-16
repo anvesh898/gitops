@@ -19,13 +19,19 @@ jobs:
         run: |
           latest_tag=$(git describe --abbrev=0 --tags 2>/dev/null || echo "")
           echo "Latest tag: $latest_tag"
-
+  
           # Check if the base branch is main
           if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
-            # Increment the tag
-            new_tag=$(python -c "version = list(map(int, '$latest_tag'.split('.'))); version[-1] += 1; print('.'.join(map(str, version)))")
-
-            # Create and push the new tag
-            git tag $new_tag
-            git push origin $new_tag
+            # Increment the tag if it's not empty
+            if [ -n "$latest_tag" ]; then
+              new_tag=$(python -c "version = list(map(int, '$latest_tag'.split('.'))); version[-1] += 1; print('.'.join(map(str, version)))")
+  
+              # Create and push the new tag
+              git tag $new_tag
+              git push origin $new_tag
+            else
+              echo "No existing tags found. Skipping tag incrementation."
+              # Handle the case when there are no existing tags
+              # Add your custom logic here
+            fi
           fi
