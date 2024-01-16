@@ -17,7 +17,7 @@ jobs:
 
       - name: Get the latest tag (if available)
         run: |
-          latest_tag=`git describe --abbrev=0 --tags`
+          latest_tag=$(git describe --abbrev=0 --tags 2>/dev/null || echo "")
           echo "Latest tag: $latest_tag"
 
           # Check if the base branch is main
